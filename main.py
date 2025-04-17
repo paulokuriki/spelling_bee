@@ -12,6 +12,7 @@ from pathlib import Path
 from time import time
 from typing import Optional, Tuple
 
+
 # Import OpenAI for text-to-speech and speech-to-text
 from openai import OpenAI
 
@@ -22,6 +23,60 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+import hmac
+
+def check_password():
+    """Returns `True` if the user entered a correct password."""
+
+    def login_form():
+        """Streamlit-only login form with improved UX."""
+        _, c2, _ = st.columns([1, 2, 1])
+        with c2:
+            with st.container(border=False):
+
+                st.write("# 🔐 Login")
+                st.write("Please enter your credentials to access the dashboard.")
+
+                # Centering with columns
+                #col1, col2, col3 = st.columns([1, 2, 1])
+                #with col2:
+                # Username and Password Fields inside a form
+                with st.form("Login Form"):
+                    st.text_input("Username", key="username", placeholder="Enter your username")
+                    st.text_input("Password", type="password", key="password", placeholder="Enter your password")
+                    submit_button = st.form_submit_button("Log in")
+
+                    # Call the password check if button is clicked
+                    if submit_button:
+                        password_entered()
+
+    def password_entered():
+        """Checks if the entered password is correct."""
+        if st.session_state["username"] in st.secrets["passwords"] and hmac.compare_digest(
+            st.session_state["password"], st.secrets.passwords[st.session_state["username"]]
+        ):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Don't store the username or password.
+            del st.session_state["username"]
+        else:
+            st.session_state["password_correct"] = False
+
+    # Return True if the username and password are validated.
+    if st.session_state.get("password_correct", False):
+        return True
+
+    # Show inputs for username and password.
+    login_form()
+    if "password_correct" in st.session_state and not st.session_state["password_correct"]:
+        st.error("😕 User not known or password incorrect")
+    return False
+
+# Call the `check_password` function to display the login page
+if not check_password():
+    st.stop()  # Stop execution if login is unsuccessful
+
+
 
 # Constants
 MAX_DURATION_AUDIO = 15  # Maximum duration of audio recording in seconds
