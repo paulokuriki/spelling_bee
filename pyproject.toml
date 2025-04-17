@@ -1,0 +1,12 @@
+[project]
+name = "spelling-bee"
+version = "0.1.0"
+description = "A spelling bee practice application with text-to-speech and speech recognition"
+requires-python = ">=3.12"
+dependencies = [
+    "streamlit>=1.32.0",
+    "openai>=1.13.0",
+    "python-dotenv>=1.0.0"
+]
+[tool.setuptools]
+packages = ["spelling_bee"]
